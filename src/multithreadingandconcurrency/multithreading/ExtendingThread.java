@@ -1,4 +1,4 @@
-package multithreading;
+package multithreadingandconcurrency.multithreading;
 
 class SMSThread extends Thread {
     @Override
