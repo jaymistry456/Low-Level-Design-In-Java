@@ -1,4 +1,4 @@
-package lowleveldesigns;
+package lowleveldesigns.ridesharingapp;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -59,7 +59,7 @@ knows:
 does:
     nothing (data carrier)
 * */
-class CustomerR {
+class Customer {
     private String customerId;
     private String customerName;
     private String customerEmail;
@@ -67,7 +67,7 @@ class CustomerR {
     private int customerPhoneNumber;
     private int CreditCardInfor;
 
-    public CustomerR(String customerId, String customerName, String customerEmail, String customerPhoneEmail, int customerPhoneNumber, int creditCardInfor) {
+    public Customer(String customerId, String customerName, String customerEmail, String customerPhoneEmail, int customerPhoneNumber, int creditCardInfor) {
         this.customerId = customerId;
         this.customerName = customerName;
         this.customerEmail = customerEmail;
@@ -186,7 +186,7 @@ class Driver {
 // Ride
 /*
 knows:
-    CustomerR
+    Customer
     Driver
     RideType
     RideStatus
@@ -199,7 +199,7 @@ does:
     getDistance() -> double
 * */
 class Ride {
-    private CustomerR customerR;
+    private Customer customer;
     private Driver driver;
     private RideType rideType;
     private RideStatus rideStatus;
@@ -209,8 +209,8 @@ class Ride {
 
     private final ReentrantLock lock = new ReentrantLock();
 
-    public Ride(CustomerR customer, RideType rideType, Location srcLocation, Location destLocation) {
-        this.customerR = customer;
+    public Ride(Customer customer, RideType rideType, Location srcLocation, Location destLocation) {
+        this.customer = customer;
         this.rideType = rideType;
         this.rideStatus = RideStatus.SEARCHING;
         this.srcLocation = srcLocation;
@@ -231,8 +231,8 @@ class Ride {
         }
     }
 
-    public CustomerR getCustomer() {
-        return customerR;
+    public Customer getCustomer() {
+        return customer;
     }
 
     public Driver getDriver() {
@@ -315,7 +315,7 @@ knows:
 does:
     calculate(distance, RideType) -> double
 * */
-class PricingCalculatorR {
+class PricingCalculator {
     public double calculate(double distance, RideType rideType) {
         return rideType.getPrice() * distance;
     }
@@ -324,44 +324,44 @@ class PricingCalculatorR {
 // RideSharingSystem
 /*
 knows:
-    List<CustomerR>
+    List<Customer>
     List<Driver>
     List<Ride>
     RideMatchingStrategy
     PricingCalculator
 does:
-    addCustomer(CustomerR)
-    removeCustomer(CustomerR)
+    addCustomer(Customer)
+    removeCustomer(Customer)
     addDriver(Driver)
     removeDriver(Driver)
-    bookRide(CustomerR, source, destination)
+    bookRide(Customer, source, destination)
     cancelRide(Ride)
     acceptRide(Driver, Ride)
     completeRide(Ride)
-    rateDriver(CustomerR, Driver, rating)
+    rateDriver(Customer, Driver, rating)
 * */
 class RideSharingSystem {
-    private List<CustomerR> customers;
+    private List<Customer> customers;
     private List<Driver> drivers;
     private List<Ride> rides;
     private RideMatchingStrategy rideMatchingStrategy;
-    private PricingCalculatorR pricingCalculatorR;
+    private PricingCalculator pricingCalculator;
 
     private final double SEARCH_RADIUS = 10;
 
-    public RideSharingSystem(RideMatchingStrategy rideMatchingStrategy, PricingCalculatorR pricingCalculator) {
+    public RideSharingSystem(RideMatchingStrategy rideMatchingStrategy, PricingCalculator pricingCalculator) {
         this.customers = new ArrayList<>();
         this.drivers = new ArrayList<>();
         this.rides = new ArrayList<>();
         this.rideMatchingStrategy = rideMatchingStrategy;
-        this.pricingCalculatorR = pricingCalculator;
+        this.pricingCalculator = pricingCalculator;
     }
 
-    public void addCustomer(CustomerR customer) {
+    public void addCustomer(Customer customer) {
         customers.add(customer);
     }
 
-    public void removeCustomer(CustomerR customer) {
+    public void removeCustomer(Customer customer) {
         customers.remove(customer);
     }
 
@@ -373,7 +373,7 @@ class RideSharingSystem {
         drivers.remove(driver);
     }
 
-    public Ride bookRide(CustomerR customer, RideType rideType, Location srcLocation, Location destLocation) {
+    public Ride bookRide(Customer customer, RideType rideType, Location srcLocation, Location destLocation) {
         List<Driver> drivers = rideMatchingStrategy.findNearbyDrivers(srcLocation, SEARCH_RADIUS);
         if(drivers.isEmpty()) return null;
 
@@ -395,7 +395,7 @@ class RideSharingSystem {
 
     public void completeRide(Ride ride) {
         ride.updateStatus(RideStatus.COMPLETED);
-        double price = pricingCalculatorR.calculate(ride.getDestLocation().distanceTo(ride.getSrcLocation()), ride.getRideType());
+        double price = pricingCalculator.calculate(ride.getDestLocation().distanceTo(ride.getSrcLocation()), ride.getRideType());
         ride.setPrice(price);
         ride.getDriver().available();
     }
@@ -414,5 +414,5 @@ RideSharingSystem has-a List of PricingCalculator
 
 RideMatchingStrategy has-a List of Drivers
 
-Ride has-a CustomerR and a Driver
+Ride has-a Customer and a Driver
 * */

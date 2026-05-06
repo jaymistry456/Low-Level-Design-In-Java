@@ -1,4 +1,4 @@
-package lowleveldesigns;
+package lowleveldesigns.movieticketbookingsystem;
 
 /*
 SeatType (enum):
