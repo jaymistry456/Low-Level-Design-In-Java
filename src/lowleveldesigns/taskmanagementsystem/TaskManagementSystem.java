@@ -241,8 +241,10 @@ TaskFilter
                 TaskPriority
                 User (assignee)
             does:
-                withStatus(TaskStatus) -> TaskFilter
-                withPriority(TaskPriority) -> TaskFilter
+                withStatus(TaskStatus) -> TaskFilterBuilder
+                withPriority(TaskPriority) -> TaskFilterBuilder
+                withAssignee(User) -> TaskFilterBuilder
+                build() -> TaskFilter
 * */
 class TaskFilter {
     private TaskStatus status;
@@ -277,6 +279,11 @@ class TaskFilter {
 
         public TaskFilterBuilder withPriority (TaskPriority priority) {
             this.priority = priority;
+            return this;
+        }
+
+        public TaskFilterBuilder withAssignee (User assignee) {
+            this.assignee = assignee;
             return this;
         }
 
